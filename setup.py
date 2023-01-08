@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='supadef',
+    name='supadef_TEST',
     version='0.1.0',
-    description='client for supadef platform',
+    description='client for the supadef platform',
     url='TODO',
     author='Connor McLaughlin',
     author_email='connor@fractall.com',
