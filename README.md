@@ -1,1 +1,1 @@
-# Official CLI for supadef platform
+# Official command-line interface for supadef platform ⚡️
