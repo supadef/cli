@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "supadef_TEST"
+version = "0.0.1"
+authors = [
+  { name="Connor McLaughlin", email="connor@fractall.com" },
+]
+description = "Official command-line interface for supadef ⚡️"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/connormcl/supadef_cli"
+"Bug Tracker" = "https://github.com/connormcl/supadef_cli/issues"
