@@ -1,1 +1,2 @@
-# Official command-line interface for supadef platform ⚡️
+# supadef ⚡️
+Official command-line interface to the Supadef platform. 
