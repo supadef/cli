@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "supadef_TEST"
-version = "0.0.1"
+version = "0.0.3"
 authors = [
   { name="Connor McLaughlin", email="connor@fractall.com" },
 ]
@@ -15,7 +15,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "typer"
+    "click==8.1.3",
+    "typer==0.7.0"
 ]
 
 [project.urls]
