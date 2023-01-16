@@ -28,6 +28,7 @@ def bye(name: str):
 def init(project_name: str):
     # 1.
     execute_bash_command(f'mkdir -p {project_name}')
+    execute_bash_command(f'')
 
 
 @app.command()
