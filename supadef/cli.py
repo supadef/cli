@@ -62,7 +62,6 @@ def connect():
         "Content-Type": "application/json"
     }
 
-    # response = requests.get("http://localhost:8000/email", headers=headers)
     response = requests.get("https://supadef.com/email", headers=headers)
 
     print(response.status_code)
