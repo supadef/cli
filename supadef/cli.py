@@ -1,6 +1,8 @@
 import subprocess
 import requests
 from typer import Typer
+from credentials import parse_credentials
+import os
 
 
 def execute_bash_command(cmd):
@@ -40,8 +42,21 @@ def push():
 
 @app.command()
 def connect():
-    uid = 'my_uid'
-    key = 'my_key'
+    default_path = '~/.supadef/credentials.yml'
+    path = os.path.expanduser(default_path)
+    creds = parse_credentials(path)
+
+    if not creds:
+        raise Exception(f"Please add your credentials to {path}")
+
+    uid = creds.get('uid')
+    key = creds.get('api_key')
+
+    if not uid:
+        raise Exception('Please include your account ID by using the "uid" attribute')
+    if not key:
+        raise Exception('Please include your API Key by using the "api_key" attribute')
+
     headers = {
         "Authorization": f"uid:{uid} key:{key}",
         "Content-Type": "application/json"
