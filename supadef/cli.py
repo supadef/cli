@@ -1,9 +1,13 @@
+import sys
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 import subprocess
 import requests
 from typer import Typer
-# from .credentials import parse_credentials
-import credentials
-import os
+from credentials import parse_credentials
 
 
 def execute_bash_command(cmd):
@@ -45,7 +49,7 @@ def push():
 def connect():
     default_path = '~/.supadef/credentials.yml'
     path = os.path.expanduser(default_path)
-    creds = credentials.parse_credentials(path)
+    creds = parse_credentials(path)
 
     if not creds:
         raise Exception(f"Please add your credentials to {path}")
