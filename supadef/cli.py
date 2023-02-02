@@ -1,4 +1,5 @@
 import subprocess
+import requests
 from typer import Typer
 
 
@@ -35,6 +36,22 @@ def init(project_name: str):
 def push():
     print('push')
     pass
+
+
+@app.command()
+def connect():
+    uid = 'my_uid'
+    key = 'my_key'
+    headers = {
+        "Authorization": f"uid:{uid} key:{key}",
+        "Content-Type": "application/json"
+    }
+
+    # response = requests.get("http://localhost:8000/email", headers=headers)
+    response = requests.get("https://supadef.com/email", headers=headers)
+
+    print(response.status_code)
+    print(response.json())
 
 
 if __name__ == "__main__":
