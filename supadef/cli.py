@@ -14,34 +14,7 @@ def execute_bash_command(cmd):
     return stdout.decode().strip()
 
 
-app = Typer()
-
-
-@app.command()
-def hello():
-    print("Hello.")
-
-
-@app.command()
-def bye(name: str):
-    print(f"Bye {name}")
-
-
-@app.command()
-def init(project_name: str):
-    # 1.
-    execute_bash_command(f'mkdir -p {project_name}')
-    execute_bash_command(f'touch {project_name}/supadef.yml')
-
-
-@app.command()
-def push():
-    print('push')
-    pass
-
-
-@app.command()
-def connect():
+def get_auth_headers():
     default_path = '~/.supadef/credentials.yml'
     path = os.path.expanduser(default_path)
     creds = parse_credentials(path)
@@ -61,11 +34,41 @@ def connect():
         "Authorization": f"uid:{uid} key:{key}",
         "Content-Type": "application/json"
     }
+    return headers
 
-    response = requests.get("https://supadef.com/email", headers=headers)
 
+app = Typer()
+
+
+@app.command()
+def connect():
+    """check that you can securely connect to the supadef platform"""
+    response = requests.get("https://supadef.com/email", headers=get_auth_headers())
     print(response.status_code)
     print(response.json())
+
+
+@app.command()
+def init(project_name: str):
+    """initialize a new project"""
+    # 1.
+    execute_bash_command(f'mkdir -p {project_name}')
+    execute_bash_command(f'touch {project_name}/supadef.yml')
+
+
+@app.command()
+def projects():
+    """list your projects"""
+    response = requests.get("https://supadef.com/projects", headers=get_auth_headers())
+    print(response.status_code)
+    print(response.json())
+
+
+@app.command()
+def push():
+    print('push')
+    pass
+
 
 
 if __name__ == "__main__":
