@@ -49,11 +49,28 @@ def connect():
 
 
 @app.command()
-def init(project_name: str):
-    """initialize a new project"""
+def create(project_name: str):
+    """create a new project"""
     # 1.
     execute_bash_command(f'mkdir -p {project_name}')
     execute_bash_command(f'touch {project_name}/supadef.yml')
+    body = {
+        'name': project_name
+    }
+    response = requests.post("https://supadef.com/project", headers=get_auth_headers(), json=body)
+    print(response.status_code)
+    print(response.json())
+
+
+@app.command()
+def destroy(project_name: str):
+    """destroy a project"""
+    body = {
+        'name': project_name
+    }
+    response = requests.delete("https://supadef.com/project", headers=get_auth_headers(), json=body)
+    print(response.status_code)
+    print(response.json())
 
 
 @app.command()
