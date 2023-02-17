@@ -5,6 +5,9 @@ from typer import Typer
 from .credentials import parse_credentials
 
 
+TIMEOUT_SECONDS = 3 * 60
+
+
 def execute_bash_command(cmd):
     print(cmd)
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -57,7 +60,7 @@ def create(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.post("https://supadef.com/project", headers=get_auth_headers(), json=body)
+    response = requests.post("https://supadef.com/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
@@ -68,7 +71,7 @@ def destroy(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.delete("https://supadef.com/project", headers=get_auth_headers(), json=body)
+    response = requests.delete("https://supadef.com/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
