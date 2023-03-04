@@ -82,10 +82,10 @@ def projects():
     """list your projects"""
     response = requests.get("https://supadef.com/projects", headers=get_auth_headers())
     print(response.status_code)
-    print(response.json())
+    # print(response.json())
 
     __projects = response.json()
-    headers = ['state', 'name']
+    headers = ['state', 'name', 'created_at', 'error_msg']
     table = [[p[x] for x in headers] for p in __projects]
     echo(tabulate(table, headers=headers))
 
