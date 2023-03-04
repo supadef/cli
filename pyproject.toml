@@ -2,9 +2,15 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+# How to reference requirements.txt
+# https://stackoverflow.com/questions/73600082/how-to-reference-a-requirements-txt-in-the-pyproject-toml-of-a-setuptools-projec
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
 [project]
+dynamic = ["dependencies"]
 name = "supadef"
-version = "0.0.9"
+version = "0.0.11"
 authors = [
   { name="Connor McLaughlin", email="connor@fractall.com" },
 ]
@@ -13,15 +19,6 @@ readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
-]
-# This was why it wasn't installing in the test version.
-# pip was looking for dependencies in Test PyPi
-# https://stackoverflow.com/questions/57321119/pip-does-not-install-dependencies-declared-in-setup-py-with-install-requires
-dependencies = [
-    "click==8.1.3",
-    "typer==0.7.0",
-    "requests==2.28.2",
-    "pyyaml==6.0"
 ]
 
 [project.urls]
