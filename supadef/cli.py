@@ -1,8 +1,9 @@
 import os
 import subprocess
 import requests
-from typer import Typer
+from typer import Typer, echo
 from .credentials import parse_credentials
+from tabulate import tabulate
 
 
 TIMEOUT_SECONDS = 3 * 60
@@ -82,6 +83,11 @@ def projects():
     response = requests.get("https://supadef.com/projects", headers=get_auth_headers())
     print(response.status_code)
     print(response.json())
+
+    __projects = response.json()
+    headers = ['state', 'name']
+    table = [[p[x] for x in headers] for p in __projects]
+    echo(tabulate(table, headers=headers))
 
 
 @app.command()
