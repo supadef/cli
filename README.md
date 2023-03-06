@@ -32,6 +32,13 @@ supadef destroy [project]
 supadef logs
 ```
 * Stream your project's logs.
+```bash
+supadef open [project]
+```
+* Open your project in the system web browser.
+
+## Tutorials
+
 
 ## Distribution
 
