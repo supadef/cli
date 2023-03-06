@@ -1,13 +1,13 @@
 # Supadef CLI ⚡️
 _Official command-line interface to the Supadef platform._
 
-## Overview
+# Overview
 The ```supadef``` CLI tool allows you to interact with the Supadef platform.
 You can use it to manage projects, functions, and deployments. 
 
 [//]: # (You can use it to create, deploy, list, and destroy projects.)
 
-## Commands
+# Commands
 
 ```bash
 supadef login
@@ -29,7 +29,7 @@ Adds a new git remote called ```supadef``` to the local repo.
 ```bash
 supadef deploy [env] [commit]
 ```
-* Deploy you project.
+* Deploy your project.
 You can set the version, and environment if you want.
 
 ```bash
@@ -49,10 +49,10 @@ supadef open [project]
 ```
 * Open your project in the system web browser.
 
-## Tutorials
+# Tutorials
+[todo]
 
-
-## Distribution
+# Distribution
 
 Distributed via PyPI package: [https://pypi.org/project/supadef/](https://pypi.org/project/supadef/)
 
