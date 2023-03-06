@@ -56,8 +56,8 @@ def connect():
 def create(project_name: str):
     """create a new project"""
     # 1.
-    execute_bash_command(f'mkdir -p {project_name}')
-    execute_bash_command(f'touch {project_name}/supadef.yml')
+    # execute_bash_command(f'mkdir -p {project_name}')
+    # execute_bash_command(f'touch {project_name}/supadef.yml')
     body = {
         'name': project_name
     }
