@@ -1,20 +1,36 @@
 
-# VERSION = "0.0.3"
-
-
-def endpoint(route: str):
-    """define a function as a web endpoint"""
+def compose():
+    """Main wrapper to begin composing flows"""
     pass
 
 
-def image(matrix):
-    """from a matrix of data, show an image"""
+def text_input(arg: str, hidden=False):
+    """
+    Text Input (function argument)
+    :param arg: the argument this input will be passed into
+    :param hidden: if True, will hide the input password-style
+    :return:
+    """
     pass
 
 
-def mapviewer():
+def button(title: str, action='run', color='theme:action'):
+    """
+    UI Button (run function, go to another function)
+    :param title: title of the button
+    :param action: run = run the function, goto:[func] opens another function
+    :param color: color of the button
+    :return:
+    """
     pass
 
 
-def form_input():
+def card(title: str, color='theme:action'):
+    """
+    UI Card (display prominent Text)
+    :param title: text to display
+    :param color: color of the button
+    :return:
+    """
     pass
+
