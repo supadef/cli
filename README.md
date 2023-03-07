@@ -49,6 +49,91 @@ supadef open [project]
 ```
 * Open your project in the system web browser.
 
+# Decorators
+The main magic behind Supadef is the fact that you can deploy
+full-stack apps with just a few lines of Python.
+
+Tell Supadef how you want to deploy your functions by using decorators.
+
+[//]: # (Deploy apps, endpoints, workers, web-forms)
+
+## Example: A sign-up form
+
+Decorators used:```@form```, ```@hidden```
+
+```python
+from supadef import form, hidden
+
+@form('Sign up')
+@hidden('password')
+def sign_up(name: str,
+            email: str, 
+            password: str):
+    return f"""
+    Signed in as: {email}
+    """
+```
+
+## Example: An auth-protected HTTP endpoint, along with client SDKs in Swift & Javascript
+Decorators used: ```@endpoint```, ```@sdk```, ```@auth```
+```python
+from supadef import endpoint, sdk, auth
+
+@endpoint('GET /recommendations') # Scalable Web API
+@sdk('swift') # auto-generate networking code & simple Swift View Controllers
+@sdk('javascript') # auto-generate networking code & simple HTML/CSS Forms
+@auth('user_id') # must be logged in to run this function.
+def get_video_recommendations(user_id: str):
+    videos = []
+    
+    # Run your ML model here
+
+    return videos
+```
+
+## Example: Get a Ride feature in a ride-share app
+Decorators used: ```@map_selector```, 
+```@auth```, 
+```@compose```,
+```@map_view```, 
+```@drawer```,
+```@vstack```,
+```@options```,
+```@button```,
+```@goto```,
+```python
+from supadef import map_selector, auth
+from supadef.data import Address
+
+
+@auth('user_id') # must be logged in to run this function.
+@map_selector('address') # gives a nice UX for selecting an address, complete with a Map View
+@goto('choose_ride_level')
+def select_desination(user_id: str, address: Address):
+    return address
+
+
+@auth('user_id') # must be logged in to run this function.
+@compose( # let's us define endlessly customizable UI layout
+    map_view('address'), # display a full-page map view.
+    drawer( # UI component that slides out
+        vstack(
+            options('level',[
+                'Uber X',
+                'Uber Black',
+                'Uber XL',
+                'Uber Pool',
+            ]),
+            button('Confirm Ride')      
+        )
+    ),
+)
+def choose_ride_level(address: Address, level: str):
+    pass
+```
+
+
+
 # Tutorials
 [todo]
 

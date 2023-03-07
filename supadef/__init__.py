@@ -15,3 +15,6 @@ def image(matrix):
 def mapviewer():
     pass
 
+
+def form_input():
+    pass
