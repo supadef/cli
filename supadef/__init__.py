@@ -1,6 +1,11 @@
 
-def compose():
-    """Main wrapper to begin composing flows"""
+def compose(*args, returns=None):
+    """
+    Main wrapper to begin composing flows
+    :param args: UI to compose
+    :param returns: UI from result of function
+    :return:
+    """
     pass
 
 

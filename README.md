@@ -73,7 +73,7 @@ from supadef import compose, text_input, button, card
     returns=card
 )
 def hello_world(name: str):
-    return f'Hello, {}'
+    return f'Hello, {name}'
 ```
 
 
