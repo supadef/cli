@@ -77,22 +77,38 @@ def hello_world(name: str):
 ```
 
 
-
 ## Example: A sign-up form
 
-Decorators used:```@form```, ```@hidden```
+Decorators used:
+```@compose```,
+```@text_input```, 
+```@button```, 
+```@card```, 
+```@subtitle```, 
 
 ```python
-from supadef import form, hidden
+from supadef import compose, text_input, button, card, title
 
-@form('Sign up')
-@hidden('password')
+@compose(
+    text_input('name'),
+    text_input('email'),
+    text_input('password', hidden=True),
+    button('Sign Up'),
+    returns=(
+        card('out0'),
+        title('h3', 'out1')
+    )
+)
 def sign_up(name: str,
             email: str, 
             password: str):
-    return f"""
-    Signed in as: {email}
-    """
+    
+    # Authenticate with Auth provider here
+    
+    return (
+        f'Welcome back, {name}!',
+        f'In case you forgot, your email is: {email}'
+    )
 ```
 
 ## Example: An auth-protected HTTP endpoint, along with client SDKs in Swift & Javascript
