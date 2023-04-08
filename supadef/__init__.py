@@ -6,7 +6,7 @@ def compose(*args, returns=None):
     :return:
     """
     def g(f):
-        pass
+        return f
     return g
 
 def text_input(arg: str, hidden: bool = False):

@@ -1,5 +1,6 @@
 .idea
 venv
+venv_pub_cli
 *.pyc
 *.egg-info
 dist
