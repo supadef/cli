@@ -1,9 +1,16 @@
-def compose(*args, returns=None):
+def compose(*args):
     """
-    Main wrapper to begin composing flows
+    Define a UX to invoke the function
     :param args: UI to compose
-    :param returns: UI from result of function
     :return:
+    """
+    def g(f):
+        return f
+    return g
+
+def returns(*args):
+    """
+    Define a UX to return, after invoking the function
     """
     def g(f):
         return f
@@ -28,11 +35,20 @@ def button(title: str, action: str = 'run', color: str = 'theme:action'):
     pass
 
 
-def card(title: str, color: str = 'theme:primary'):
+def card(child: Any, color: str = 'theme:primary'):
     """
     Card: display prominent text
-    :param title: The text to display
+    :param child: The inner UI component
     :param color: The background color of the card
+    """
+    pass
+
+
+def title(title: str, color: str = 'theme:text_on_primary'):
+    """
+    Display prominent text
+    :param title: The text to display
+    :param color: The color of the text
     """
     pass
 
