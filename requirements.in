@@ -4,3 +4,4 @@ twine
 pyyaml
 pytest
 tabulate
+yaspin
