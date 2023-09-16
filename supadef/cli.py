@@ -14,6 +14,7 @@ import zipfile
 TIMEOUT_SECONDS = 3 * 60
 ROOT_DOMAIN = 'https://supadef.com'
 # ROOT_DOMAIN = 'http://localhost:8000'
+LOCAL_CREDS_PATH = '~/.supadef/credentials.yml'
 
 
 def execute_bash_command(cmd):
@@ -26,8 +27,7 @@ def execute_bash_command(cmd):
 
 
 def get_credentials():
-    default_path = '~/.supadef/credentials.yml'
-    path = os.path.expanduser(default_path)
+    path = os.path.expanduser(LOCAL_CREDS_PATH)
     creds = parse_credentials(path)
     if not creds:
         raise Exception(f"Please add your credentials to {path}")
