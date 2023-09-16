@@ -25,13 +25,17 @@ def execute_bash_command(cmd):
     return stdout.decode().strip()
 
 
-def get_auth_headers():
+def get_credentials():
     default_path = '~/.supadef/credentials.yml'
     path = os.path.expanduser(default_path)
     creds = parse_credentials(path)
-
     if not creds:
         raise Exception(f"Please add your credentials to {path}")
+    return creds
+
+
+def get_auth_headers():
+    creds = get_credentials()
 
     uid = creds.get('uid')
     key = creds.get('api_key')
