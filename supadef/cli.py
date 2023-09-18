@@ -12,8 +12,8 @@ import zipfile
 
 
 TIMEOUT_SECONDS = 3 * 60
-ROOT_DOMAIN = 'https://supadef.com'
-# ROOT_DOMAIN = 'http://localhost:8000'
+# ROOT_DOMAIN = 'https://supadef.com'
+ROOT_DOMAIN = 'http://localhost:8000'
 LOCAL_CREDS_PATH = '~/.supadef/credentials.yml'
 
 
@@ -79,33 +79,43 @@ def create(project_name: str):
 @app.command()
 def push(project_name: str, path_to_code: str):
     """push your code to a project"""
-    def zip_directory(directory_path, zip_filename):
-        # Create a ZIP file
-        with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for root, _, files in os.walk(directory_path):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, directory_path)
-                    zipf.write(file_path, arcname=arcname)
+    with yaspin(text=f"Pushing your code to {project_name}", color="yellow") as sp:
+        def zip_directory(directory_path, zip_filename):
+            # Create a ZIP file
+            with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for root, _, files in os.walk(directory_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, directory_path)
+                        zipf.write(file_path, arcname=arcname)
 
-    def upload_zip_file(zip_filename, upload_url):
-        with open(zip_filename, 'rb') as file:
-            files = {'file': (zip_filename, file)}
-            body = {
-                'name': project_name
-            }
-            response = requests.post(upload_url,
-                                     headers=get_auth_headers(),
-                                     # json=body,
-                                     files=files,
-                                     timeout=TIMEOUT_SECONDS)
-            print(response.status_code)
-            print(response.json())
+        def upload_zip_file(zip_filename, upload_url):
+            with open(zip_filename, 'rb') as file:
+                files = {'file': (zip_filename, file)}
+                body = {
+                    'name': project_name
+                }
+                response = requests.post(upload_url,
+                                         headers=get_auth_headers(),
+                                         # json=body,
+                                         files=files,
+                                         timeout=TIMEOUT_SECONDS)
+                print(response.status_code)
+                print(response.json())
 
-    upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"  # Replace with your actual upload endpoint URL
-    zip_filename = "package.zip"
-    zip_directory(path_to_code, zip_filename)
-    upload_zip_file(zip_filename, upload_url)
+        try:
+            upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"  # Replace with your actual upload endpoint URL
+            zip_filename = "package.zip"
+            zip_directory(path_to_code, zip_filename)
+            upload_zip_file(zip_filename, upload_url)
+            sp.text = f'Task submitted'
+            sp.ok("✅ ")
+        except Exception as e:
+            sp.text = 'Something went wrong'
+            sp.fail()
+            print(e)
+
+
 
 
 @app.command()
@@ -114,18 +124,28 @@ def run(project: str,
         args: str,
         version: str):
     """run your function in the cloud"""
-    run_url = os.path.join(ROOT_DOMAIN, 'run')
+    with yaspin(text="Submitting task...", color="yellow") as sp:
+        run_url = os.path.join(ROOT_DOMAIN, 'run')
 
-    body = {
-        'project': project,
-        'function': function,
-        'args': args,
-        'version': version
-    }
-    response = requests.post(run_url, headers=get_auth_headers(), json=body,
-                             timeout=TIMEOUT_SECONDS)
-    print(response.status_code)
-    print(response.json())
+        body = {
+            'project': project,
+            'function': function,
+            'args': args,
+            'version': version
+        }
+        response = requests.post(run_url, headers=get_auth_headers(), json=body,
+                                 timeout=TIMEOUT_SECONDS)
+        print(response.status_code)
+        print(response.json())
+
+        if response.status_code == 200:
+            sp.text = f'Task submitted'
+            sp.ok("✅ ")
+        else:
+            sp.text = 'Something went wrong'
+            sp.fail()
+            print(response.status_code)
+            print(response.json())
 
 
 @app.command()
