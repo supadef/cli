@@ -102,13 +102,16 @@ def push(project_name: str, path_to_code: str):
                                          timeout=TIMEOUT_SECONDS)
                 print(response.status_code)
                 print(response.json())
+                if not response.status_code == 200:
+                    pass
+                return response.json()
 
         try:
             upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"  # Replace with your actual upload endpoint URL
             zip_filename = "package.zip"
             zip_directory(path_to_code, zip_filename)
-            upload_zip_file(zip_filename, upload_url)
-            sp.text = f'Task submitted'
+            upload_result_json = upload_zip_file(zip_filename, upload_url)
+            sp.text = f'Uploaded your code'
             sp.ok("✅ ")
         except Exception as e:
             sp.text = 'Something went wrong'
