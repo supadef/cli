@@ -119,8 +119,6 @@ def push(project_name: str, path_to_code: str):
             print(e)
 
 
-
-
 @app.command()
 def run(project: str,
         function: str,
@@ -139,11 +137,33 @@ def run(project: str,
         response = requests.post(run_url, headers=get_auth_headers(), json=body,
                                  timeout=TIMEOUT_SECONDS)
         print(response.status_code)
-        print(response.json())
+        pretty_json = json.dumps(response.json(), indent=4)
+        print(pretty_json)
 
         if response.status_code == 200:
             sp.text = f'Task submitted'
             sp.ok("✅ ")
+        else:
+            sp.text = 'Something went wrong'
+            sp.fail()
+            print(response.status_code)
+            print(response.json())
+
+
+@app.command()
+def logs(project: str, task_id: str):
+    """
+    get a function's run logs, for a particular run
+    """
+    with yaspin(text="Getting logs...", color="yellow") as sp:
+        run_url = os.path.join(ROOT_DOMAIN, f'fn/logs/{project}/{task_id}')
+        response = requests.get(run_url, headers=get_auth_headers(), timeout=TIMEOUT_SECONDS)
+
+        if response.status_code == 200:
+            sp.text = f'Got logs'
+            sp.ok("✅ ")
+            pretty_json = json.dumps(response.json(), indent=4)
+            print(pretty_json)
         else:
             sp.text = 'Something went wrong'
             sp.fail()
