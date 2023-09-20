@@ -12,8 +12,8 @@ import zipfile
 
 
 TIMEOUT_SECONDS = 3 * 60
-# ROOT_DOMAIN = 'https://supadef.com'
-ROOT_DOMAIN = 'http://localhost:8000'
+ROOT_DOMAIN = 'https://supadef.com'
+# ROOT_DOMAIN = 'http://localhost:8000'
 LOCAL_CREDS_PATH = '~/.supadef/credentials.yml'
 
 
