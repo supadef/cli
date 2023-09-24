@@ -17,6 +17,32 @@ ROOT_DOMAIN = 'https://supadef.com'
 LOCAL_CREDS_PATH = '~/.supadef/credentials.yml'
 
 
+app = Typer()
+# app_create = Typer()
+# app.add_typer(app_create,
+#               name='env',
+#               no_args_is_help=True,
+#               short_help="manage your project's environment variables")
+#
+#
+# @app_create.command(name='add')
+# def env_add(project: str, var: str, val: str):
+#     """
+#     Securely add an environment variable to your project.
+#
+#     All environment variables will be available in your code's runtime.
+#
+#     Accessible from your code via:
+#     import os
+#     value = os.environ['VAR_NAME']
+#     :param project:
+#     :param var:
+#     :param val:
+#     :return:
+#     """
+#     pass
+
+
 def execute_bash_command(cmd):
     print(cmd)
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -51,7 +77,28 @@ def get_auth_headers():
     return headers
 
 
-app = Typer()
+def zip_directory(directory_path, zip_filename):
+    # Create a ZIP file
+    with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, _, files in os.walk(directory_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, directory_path)
+                zipf.write(file_path, arcname=arcname)
+
+
+def upload_file(file_path, upload_url):
+    with open(file_path, 'rb') as file:
+        files = {'file': (file_path, file)}
+        response = requests.post(upload_url,
+                                 headers=get_auth_headers(),
+                                 files=files,
+                                 timeout=TIMEOUT_SECONDS)
+        print(response.status_code)
+        print(response.json())
+        if not response.status_code == 200:
+            pass
+        return response.json()
 
 
 @app.command()
@@ -80,38 +127,27 @@ def create(project_name: str):
 def push(project_name: str, path_to_code: str):
     """push your code to a project"""
     with yaspin(text=f"Pushing your code to {project_name}", color="yellow") as sp:
-        def zip_directory(directory_path, zip_filename):
-            # Create a ZIP file
-            with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for root, _, files in os.walk(directory_path):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, directory_path)
-                        zipf.write(file_path, arcname=arcname)
-
-        def upload_zip_file(zip_filename, upload_url):
-            with open(zip_filename, 'rb') as file:
-                files = {'file': (zip_filename, file)}
-                body = {
-                    'name': project_name
-                }
-                response = requests.post(upload_url,
-                                         headers=get_auth_headers(),
-                                         # json=body,
-                                         files=files,
-                                         timeout=TIMEOUT_SECONDS)
-                print(response.status_code)
-                print(response.json())
-                if not response.status_code == 200:
-                    pass
-                return response.json()
-
         try:
             upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"  # Replace with your actual upload endpoint URL
             zip_filename = "package.zip"
             zip_directory(path_to_code, zip_filename)
-            upload_result_json = upload_zip_file(zip_filename, upload_url)
+            upload_result_json = upload_file(zip_filename, upload_url)
             sp.text = f'Uploaded your code'
+            sp.ok("✅ ")
+        except Exception as e:
+            sp.text = 'Something went wrong'
+            sp.fail()
+            print(e)
+
+
+@app.command(name='set_env')
+def set_env(project_name: str, path_to_env_file: str):
+    """Securely upload an environment file (.env) to your project"""
+    with yaspin(text=f"Securely uploading your environment to project:{project_name}", color="yellow") as sp:
+        try:
+            upload_url = f"{ROOT_DOMAIN}/project/{project_name}/set_env"  # Replace with your actual upload endpoint URL
+            upload_result_json = upload_file(path_to_env_file, upload_url)
+            sp.text = f'Uploaded'
             sp.ok("✅ ")
         except Exception as e:
             sp.text = 'Something went wrong'
