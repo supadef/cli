@@ -25,8 +25,14 @@ supadef create [project_name]
 ```
 * Create a new project with the given name in your account.
 Project names must be unique across all Supadef projects.
-Must be run from a git repository. 
-Adds a new git remote called ```supadef``` to the local repo.
+<!-- Must be run from a git repository.  -->
+<!-- Adds a new git remote called ```supadef``` to the local repo. -->
+
+```bash
+supadef projects
+```
+* List the projects in your account. Includes information on your project's deployment state.
+
 
 ```bash
 supadef push [project_name] [path/to/code_dir]
@@ -52,10 +58,6 @@ supadef deploy [env] [commit]
 * Deploy your project.
 You can set the version, and environment if you want. -->
 
-```bash
-supadef projects
-```
-* List the projects in your account. Includes information on your project's deployment state.
 ```bash
 supadef destroy [project]
 ```
