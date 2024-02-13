@@ -4,5 +4,6 @@ def task():
     :return:
     """
     def g(f):
+        # intentionally do nothing :)
         return f
     return g

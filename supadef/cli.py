@@ -9,6 +9,9 @@ from tabulate import tabulate
 from random import randint
 from yaspin import yaspin
 import zipfile
+import os
+import tempfile
+import shutil
 
 
 TIMEOUT_SECONDS = 3 * 60
@@ -18,29 +21,6 @@ LOCAL_CREDS_PATH = '~/.supadef/credentials.yml'
 
 
 app = Typer()
-# app_create = Typer()
-# app.add_typer(app_create,
-#               name='env',
-#               no_args_is_help=True,
-#               short_help="manage your project's environment variables")
-#
-#
-# @app_create.command(name='add')
-# def env_add(project: str, var: str, val: str):
-#     """
-#     Securely add an environment variable to your project.
-#
-#     All environment variables will be available in your code's runtime.
-#
-#     Accessible from your code via:
-#     import os
-#     value = os.environ['VAR_NAME']
-#     :param project:
-#     :param var:
-#     :param val:
-#     :return:
-#     """
-#     pass
 
 
 def execute_bash_command(cmd):
@@ -123,14 +103,53 @@ def create(project_name: str):
     print(response.json())
 
 
+def create_tempdir(key, nuke_existing=True):
+    """
+    Create a clean temporary directory.
+    """
+    # get the path that we should do our work in
+    cwd = os.path.join(tempfile.gettempdir(), 'com.supadef.tempdir', key)
+    # nuke the working directory, if it exists
+    if nuke_existing and os.path.exists(cwd):
+        # https://stackoverflow.com/questions/6996603/how-can-i-delete-a-file-or-folder-in-python
+        shutil.rmtree(cwd)
+    # create it
+    os.makedirs(cwd)
+    return cwd
+
+
 @app.command()
 def push(project_name: str, path_to_code: str):
     """push your code to a project"""
-    with yaspin(text=f"Pushing your code to {project_name}", color="yellow") as sp:
+    # with yaspin(text=f"Checking for a git repository at {path_to_code}", color="yellow") as sp:
+    #     time.sleep(2)
+    #     sp.text = f'Found a git repository at {path_to_code}'
+    #     sp.ok("✅ ")
+    #     pass
+    with yaspin(text=f"Packaging your code for project: {project_name}", color="yellow") as sp:
         try:
-            upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"  # Replace with your actual upload endpoint URL
+            # create an isolated directory to build the package
+            work_dir = create_tempdir('supadef_packages')
+            # copy tree only works on non-existent directories :/
+            shutil.rmtree(work_dir)
+            # copy the source code to the build directory
+            shutil.copytree(path_to_code, work_dir)
+            # wire up the full path to the package.zip file
             zip_filename = "package.zip"
-            zip_directory(path_to_code, zip_filename)
+            path_to_package_zip = os.path.join(work_dir, zip_filename)
+            # zip up the code in the working dir, which has the client code. place output in that dir
+            zip_directory(work_dir, path_to_package_zip)
+            # package.zip file location
+            sp.text = f'Packaged your code for project: {project_name} at location: {path_to_package_zip}'
+            sp.ok("✅ ")
+        except Exception as e:
+            sp.text = 'Something went wrong'
+            sp.fail()
+            print(e)
+    with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
+        try:
+            # upload the package
+            upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"
             upload_result_json = upload_file(zip_filename, upload_url)
             sp.text = f'Uploaded your code'
             sp.ok("✅ ")
