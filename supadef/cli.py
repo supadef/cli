@@ -150,7 +150,7 @@ def push(project_name: str, path_to_code: str):
         try:
             # upload the package
             upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"
-            upload_result_json = upload_file(zip_filename, upload_url)
+            upload_result_json = upload_file(path_to_package_zip, upload_url)
             sp.text = f'Uploaded your code'
             sp.ok("✅ ")
         except Exception as e:
