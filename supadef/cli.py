@@ -145,7 +145,6 @@ def push(project_name: str, path_to_code: str):
         except Exception as e:
             sp.text = 'Something went wrong'
             sp.fail()
-            print(e)
     with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
         try:
             # upload the package
@@ -155,8 +154,7 @@ def push(project_name: str, path_to_code: str):
             sp.ok("✅ ")
         except Exception as e:
             sp.text = str(e)
-            sp.fail()
-            print(e)
+            sp.fail("❌ ")
 
 
 @app.command(name='set_env')
