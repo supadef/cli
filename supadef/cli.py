@@ -74,11 +74,11 @@ def upload_file(file_path, upload_url):
                                  headers=get_auth_headers(),
                                  files=files,
                                  timeout=TIMEOUT_SECONDS)
-        print(response.status_code)
-        print(response.json())
+        json = response.json()
         if not response.status_code == 200:
-            pass
-        return response.json()
+            error_msg = json['detail']
+            raise ValueError(error_msg)
+        return json
 
 
 @app.command()
@@ -154,7 +154,7 @@ def push(project_name: str, path_to_code: str):
             sp.text = f'Uploaded your code'
             sp.ok("✅ ")
         except Exception as e:
-            sp.text = 'Something went wrong'
+            sp.text = str(e)
             sp.fail()
             print(e)
 
