@@ -143,8 +143,8 @@ def push(project_name: str, path_to_code: str):
             sp.text = f'Packaged your code for project: {project_name} at location: {path_to_package_zip}'
             sp.ok("✅ ")
         except Exception as e:
-            sp.text = 'Something went wrong'
-            sp.fail()
+            sp.text = str(e)
+            sp.fail("❌ ")
     with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
         try:
             # upload the package
@@ -179,28 +179,31 @@ def run(project: str,
         version: str):
     """run your function in the cloud"""
     with yaspin(text="Submitting task...", color="yellow") as sp:
-        run_url = os.path.join(ROOT_DOMAIN, 'run')
+        try:
+            run_url = os.path.join(ROOT_DOMAIN, 'run')
 
-        body = {
-            'project': project,
-            'function': function,
-            'args': args,
-            'version': version
-        }
-        response = requests.post(run_url, headers=get_auth_headers(), json=body,
-                                 timeout=TIMEOUT_SECONDS)
-        print(response.status_code)
-        pretty_json = json.dumps(response.json(), indent=4)
-        print(pretty_json)
+            body = {
+                'project': project,
+                'function': function,
+                'args': args,
+                'version': version
+            }
+            response = requests.post(run_url, headers=get_auth_headers(), json=body,
+                                     timeout=TIMEOUT_SECONDS)
+            print(response.status_code)
 
-        if response.status_code == 200:
+            j = response.json()
+            if not response.status_code == 200:
+                error_msg = j['detail']
+                raise ValueError(error_msg)
+
             sp.text = f'Task submitted'
             sp.ok("✅ ")
-        else:
-            sp.text = 'Something went wrong'
-            sp.fail()
-            print(response.status_code)
-            print(response.json())
+            pretty_json = json.dumps(j, indent=4)
+            print(pretty_json)
+        except Exception as e:
+            sp.text = str(e)
+            sp.fail("❌ ")
 
 
 @app.command()
