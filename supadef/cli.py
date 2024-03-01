@@ -190,7 +190,6 @@ def run(project: str,
             }
             response = requests.post(run_url, headers=get_auth_headers(), json=body,
                                      timeout=TIMEOUT_SECONDS)
-            print(response.status_code)
 
             j = response.json()
             if not response.status_code == 200:
@@ -207,12 +206,12 @@ def run(project: str,
 
 
 @app.command()
-def logs(project: str, task_id: str):
+def logs(run_id: str):
     """
     get a function's run logs, for a particular run
     """
     with yaspin(text="Getting logs...", color="yellow") as sp:
-        run_url = os.path.join(ROOT_DOMAIN, f'fn/logs/{project}/{task_id}')
+        run_url = os.path.join(ROOT_DOMAIN, f'fn/logs/{run_id}')
         response = requests.get(run_url, headers=get_auth_headers(), timeout=TIMEOUT_SECONDS)
 
         if response.status_code == 200:
