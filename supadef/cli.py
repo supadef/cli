@@ -4,6 +4,8 @@ import requests
 import json
 import time
 from typer import Typer, echo
+
+from .config import TIMEOUT_SECONDS, SERVICE_ENDPOINT, LOCAL_CREDS_PATH
 from .credentials import parse_credentials
 from tabulate import tabulate
 from random import randint
@@ -12,12 +14,6 @@ import zipfile
 import os
 import tempfile
 import shutil
-
-
-TIMEOUT_SECONDS = 3 * 60
-ROOT_DOMAIN = 'https://supadef.com'
-# ROOT_DOMAIN = 'http://localhost:8000'
-LOCAL_CREDS_PATH = '~/.supadef/credentials.yml'
 
 
 app = Typer()
@@ -85,7 +81,7 @@ def upload_file(file_path, upload_url):
 def connect():
     """check that you can securely connect to the supadef platform"""
     with yaspin(text="Connecting to supadef platform", color="yellow") as sp:
-        response = requests.get(f"{ROOT_DOMAIN}/email", headers=get_auth_headers())
+        response = requests.get(f"{SERVICE_ENDPOINT}/email", headers=get_auth_headers())
         sp.text = f'Connected [{response.json()}]'
         sp.ok("✅ ")
         # print(response.status_code)
@@ -98,7 +94,7 @@ def create(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.post(f"{ROOT_DOMAIN}/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
+    response = requests.post(f"{SERVICE_ENDPOINT}/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
@@ -148,7 +144,7 @@ def push(project_name: str, path_to_code: str):
     with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
         try:
             # upload the package
-            upload_url = f"{ROOT_DOMAIN}/project/{project_name}/upload_package"
+            upload_url = f"{SERVICE_ENDPOINT}/project/{project_name}/upload_package"
             upload_result_json = upload_file(path_to_package_zip, upload_url)
             sp.text = f'Uploaded your code'
             sp.ok("✅ ")
@@ -162,7 +158,7 @@ def set_env(project_name: str, path_to_env_file: str):
     """Securely upload an environment file (.env) to your project"""
     with yaspin(text=f"Securely uploading your environment to project:{project_name}", color="yellow") as sp:
         try:
-            upload_url = f"{ROOT_DOMAIN}/project/{project_name}/set_env"  # Replace with your actual upload endpoint URL
+            upload_url = f"{SERVICE_ENDPOINT}/project/{project_name}/set_env"  # Replace with your actual upload endpoint URL
             upload_result_json = upload_file(path_to_env_file, upload_url)
             sp.text = f'Uploaded'
             sp.ok("✅ ")
@@ -180,7 +176,7 @@ def run(project: str,
     """run your function in the cloud"""
     with yaspin(text="Submitting task...", color="yellow") as sp:
         try:
-            run_url = os.path.join(ROOT_DOMAIN, 'run')
+            run_url = os.path.join(SERVICE_ENDPOINT, 'run')
 
             body = {
                 'project': project,
@@ -211,7 +207,7 @@ def logs(run_id: str):
     get a function's run logs, for a particular run
     """
     with yaspin(text="Getting logs...", color="yellow") as sp:
-        run_url = os.path.join(ROOT_DOMAIN, f'fn/logs/{run_id}')
+        run_url = os.path.join(SERVICE_ENDPOINT, f'fn/logs/{run_id}')
         response = requests.get(run_url, headers=get_auth_headers(), timeout=TIMEOUT_SECONDS)
 
         if response.status_code == 200:
@@ -230,7 +226,7 @@ def logs(run_id: str):
 def projects():
     """list your projects"""
     with yaspin(text="Getting projects", color="yellow") as sp:
-        response = requests.get(f"{ROOT_DOMAIN}/projects", headers=get_auth_headers())
+        response = requests.get(f"{SERVICE_ENDPOINT}/projects", headers=get_auth_headers())
         __projects = response.json()
 
         sp.text = f'Done'
@@ -247,7 +243,7 @@ def destroy(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.delete(f"{ROOT_DOMAIN}/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
+    response = requests.delete(f"{SERVICE_ENDPOINT}/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
