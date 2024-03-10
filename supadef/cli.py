@@ -7,6 +7,7 @@ from typer import Typer, echo
 
 from .config import TIMEOUT_SECONDS, SERVICE_ENDPOINT, LOCAL_CREDS_PATH
 from .credentials import parse_credentials
+from .links import link
 from tabulate import tabulate
 from random import randint
 from yaspin import yaspin
@@ -53,6 +54,21 @@ def get_auth_headers():
     return headers
 
 
+def create_tempdir(key, nuke_existing=True):
+    """
+    Create a clean temporary directory.
+    """
+    # get the path that we should do our work in
+    cwd = os.path.join(tempfile.gettempdir(), 'com.supadef.tempdir', key)
+    # nuke the working directory, if it exists
+    if nuke_existing and os.path.exists(cwd):
+        # https://stackoverflow.com/questions/6996603/how-can-i-delete-a-file-or-folder-in-python
+        shutil.rmtree(cwd)
+    # create it
+    os.makedirs(cwd)
+    return cwd
+
+
 def zip_directory(directory_path, zip_filename):
     # Create a ZIP file
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -81,7 +97,7 @@ def upload_file(file_path, upload_url):
 def connect():
     """check that you can securely connect to the supadef platform"""
     with yaspin(text="Connecting to supadef platform", color="yellow") as sp:
-        response = requests.get(f"{SERVICE_ENDPOINT}/email", headers=get_auth_headers())
+        response = requests.get(link('supadef connect'), headers=get_auth_headers())
         sp.text = f'Connected [{response.json()}]'
         sp.ok("✅ ")
         # print(response.status_code)
@@ -94,24 +110,9 @@ def create(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.post(f"{SERVICE_ENDPOINT}/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
+    response = requests.post(link('supadef create'), headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
-
-
-def create_tempdir(key, nuke_existing=True):
-    """
-    Create a clean temporary directory.
-    """
-    # get the path that we should do our work in
-    cwd = os.path.join(tempfile.gettempdir(), 'com.supadef.tempdir', key)
-    # nuke the working directory, if it exists
-    if nuke_existing and os.path.exists(cwd):
-        # https://stackoverflow.com/questions/6996603/how-can-i-delete-a-file-or-folder-in-python
-        shutil.rmtree(cwd)
-    # create it
-    os.makedirs(cwd)
-    return cwd
 
 
 @app.command()
@@ -144,7 +145,7 @@ def push(project_name: str, path_to_code: str):
     with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
         try:
             # upload the package
-            upload_url = f"{SERVICE_ENDPOINT}/project/{project_name}/upload_package"
+            upload_url = link('supadef push', project_name=project_name)
             upload_result_json = upload_file(path_to_package_zip, upload_url)
             sp.text = f'Uploaded your code'
             sp.ok("✅ ")
@@ -158,7 +159,7 @@ def set_env(project_name: str, path_to_env_file: str):
     """Securely upload an environment file (.env) to your project"""
     with yaspin(text=f"Securely uploading your environment to project:{project_name}", color="yellow") as sp:
         try:
-            upload_url = f"{SERVICE_ENDPOINT}/project/{project_name}/set_env"  # Replace with your actual upload endpoint URL
+            upload_url = link('supadef set_env', project_name=project_name)
             upload_result_json = upload_file(path_to_env_file, upload_url)
             sp.text = f'Uploaded'
             sp.ok("✅ ")
@@ -176,7 +177,7 @@ def run(project: str,
     """run your function in the cloud"""
     with yaspin(text="Submitting task...", color="yellow") as sp:
         try:
-            run_url = os.path.join(SERVICE_ENDPOINT, 'run')
+            run_url = link('supadef run')
 
             body = {
                 'project': project,
@@ -207,7 +208,7 @@ def logs(run_id: str):
     get a function's run logs, for a particular run
     """
     with yaspin(text="Getting logs...", color="yellow") as sp:
-        run_url = os.path.join(SERVICE_ENDPOINT, f'fn/logs/{run_id}')
+        run_url = link('supadef logs', run_id=run_id)
         response = requests.get(run_url, headers=get_auth_headers(), timeout=TIMEOUT_SECONDS)
 
         if response.status_code == 200:
@@ -226,7 +227,7 @@ def logs(run_id: str):
 def projects():
     """list your projects"""
     with yaspin(text="Getting projects", color="yellow") as sp:
-        response = requests.get(f"{SERVICE_ENDPOINT}/projects", headers=get_auth_headers())
+        response = requests.get(link('supadef projects'), headers=get_auth_headers())
         __projects = response.json()
 
         sp.text = f'Done'
@@ -243,7 +244,7 @@ def destroy(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.delete(f"{SERVICE_ENDPOINT}/project", headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
+    response = requests.delete(link('supadef destroy'), headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
