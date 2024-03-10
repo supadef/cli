@@ -8,7 +8,8 @@ from typer import Typer, echo
 from .config import TIMEOUT_SECONDS, SERVICE_ENDPOINT, LOCAL_CREDS_PATH
 from .credentials import parse_credentials
 from .links import link
-from ..version import VERSION
+# TODO: figure out a way to centralize version
+# from ..version import VERSION
 from tabulate import tabulate
 from random import randint
 from yaspin import yaspin
@@ -253,7 +254,7 @@ def destroy(project_name: str):
 @app.command()
 def about():
     """basic info about the running version of the CLI"""
-    print(f'Version: {VERSION}')
+    # print(f'Version: {VERSION}')
     print(f'Service endpoint: {SERVICE_ENDPOINT}')
     print(f'Looking for credentials at: {LOCAL_CREDS_PATH}')
 
