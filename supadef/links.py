@@ -18,10 +18,10 @@ def route(slug: str, loader=False) -> str:
         'supadef projects': '/projects',
         'supadef create': '/project',
         'supadef logs': '/fn/logs/{run_id}',
-        'supadef push': '/project/{name}/upload_package',
+        'supadef push': '/project/{project_name}/upload_package',
         'supadef run': '/run',
         'supadef destroy': '/project',
-        'supadef set_env': '/project/{name}/set_env'
+        'supadef set_env': '/project/{project_name}/set_env'
     }
     if slug not in slug_to_pattern.keys():
         raise ValueError(f'no such slug: {slug}')
