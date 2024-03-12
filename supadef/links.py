@@ -14,6 +14,7 @@ def route(slug: str, loader=False) -> str:
         'user > project > danger zone': '/{username}/{project}/danger_zone',
         'user > project > env': '/{username}/{project}/env',
         'docs > cli > supadef connect': '',
+        'site > waitlist': '/get_api_key',
         'supadef connect': '/email',
         'supadef projects': '/projects',
         'supadef create': '/project',
