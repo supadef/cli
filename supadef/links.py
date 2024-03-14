@@ -10,7 +10,7 @@ def route(slug: str, loader=False) -> str:
         'user > billing': '/{username}/billing',
         'user > account': '/{username}/account',
         'user > project': '/{username}/{project_name}',
-        'user > project > functions > run': '/fn/run/{run_id}',
+        'user > project > functions > run': '/{username}/{project_name}/{function}/{run_id}',
         'user > project > danger zone': '/{username}/{project}/danger_zone',
         'user > project > env': '/{username}/{project}/env',
         'docs > cli > supadef connect': '',
@@ -48,4 +48,3 @@ def link(slug: str,
     pattern = route(slug, loader).format(**subs)
 
     return service_endpoint + pattern
-
