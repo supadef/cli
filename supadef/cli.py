@@ -24,10 +24,12 @@ app = Typer()
 
 def execute_bash_command(cmd):
     print(cmd)
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode != 0:
-        raise subprocess.CalledProcessError(process.returncode, cmd, output=stdout, stderr=stderr)
+        raise subprocess.CalledProcessError(
+            process.returncode, cmd, output=stdout, stderr=stderr)
     return stdout.decode().strip()
 
 
@@ -46,9 +48,11 @@ def get_auth_headers():
     key = creds.get('api_key')
 
     if not uid:
-        raise Exception('Please include your account ID by using the "uid" attribute')
+        raise Exception(
+            'Please include your account ID by using the "uid" attribute')
     if not key:
-        raise Exception('Please include your API Key by using the "api_key" attribute')
+        raise Exception(
+            'Please include your API Key by using the "api_key" attribute')
 
     headers = {
         "Authorization": f"uid:{uid} key:{key}",
@@ -99,7 +103,8 @@ def upload_file(file_path, upload_url):
 def connect():
     """check that you can securely connect to the supadef platform"""
     with yaspin(text="Connecting to supadef platform", color="yellow") as sp:
-        response = requests.get(link('supadef connect'), headers=get_auth_headers())
+        response = requests.get(link('supadef connect'),
+                                headers=get_auth_headers())
         sp.text = f'Connected [{response.json()}]'
         sp.ok("✅ ")
         # print(response.status_code)
@@ -112,7 +117,8 @@ def create(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.post(link('supadef create'), headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
+    response = requests.post(link('supadef create'), headers=get_auth_headers(
+    ), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
@@ -147,7 +153,7 @@ def push(project_name: str, path_to_code: str):
     with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
         try:
             # upload the package
-            upload_url = link('supadef push', project_name=project_name)
+            upload_url = link('supadef push', project=project_name)
             upload_result_json = upload_file(path_to_package_zip, upload_url)
             sp.text = f'Uploaded your code'
             sp.ok("✅ ")
@@ -161,7 +167,7 @@ def set_env(project_name: str, path_to_env_file: str):
     """Securely upload an environment file (.env) to your project"""
     with yaspin(text=f"Securely uploading your environment to project:{project_name}", color="yellow") as sp:
         try:
-            upload_url = link('supadef set_env', project_name=project_name)
+            upload_url = link('supadef set_env', project=project_name)
             upload_result_json = upload_file(path_to_env_file, upload_url)
             sp.text = f'Uploaded'
             sp.ok("✅ ")
@@ -211,7 +217,8 @@ def logs(run_id: str):
     """
     with yaspin(text="Getting logs...", color="yellow") as sp:
         run_url = link('supadef logs', run_id=run_id)
-        response = requests.get(run_url, headers=get_auth_headers(), timeout=TIMEOUT_SECONDS)
+        response = requests.get(
+            run_url, headers=get_auth_headers(), timeout=TIMEOUT_SECONDS)
 
         if response.status_code == 200:
             sp.text = f'Got logs'
@@ -229,7 +236,8 @@ def logs(run_id: str):
 def projects():
     """list your projects"""
     with yaspin(text="Getting projects", color="yellow") as sp:
-        response = requests.get(link('supadef projects'), headers=get_auth_headers())
+        response = requests.get(link('supadef projects'),
+                                headers=get_auth_headers())
         __projects = response.json()
 
         sp.text = f'Done'
@@ -246,7 +254,8 @@ def destroy(project_name: str):
     body = {
         'name': project_name
     }
-    response = requests.delete(link('supadef destroy'), headers=get_auth_headers(), json=body, timeout=TIMEOUT_SECONDS)
+    response = requests.delete(link('supadef destroy'), headers=get_auth_headers(
+    ), json=body, timeout=TIMEOUT_SECONDS)
     print(response.status_code)
     print(response.json())
 
