@@ -5,3 +5,4 @@ venv_pub_cli
 *.egg-info
 dist
 .pytest_cache
+.DS_Store

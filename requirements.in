@@ -5,3 +5,4 @@ pyyaml
 pytest
 tabulate
 yaspin
+pydantic==1.10.4
