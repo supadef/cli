@@ -10,7 +10,7 @@ dependencies = {file = ["requirements.txt"]}
 [project]
 dynamic = ["dependencies"]
 name = "supadef"
-version = "0.0.43"
+version = "0.0.45"
 authors = [
   { name="Connor McLaughlin", email="connor@fractall.com" },
 ]
