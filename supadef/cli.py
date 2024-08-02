@@ -44,18 +44,18 @@ def get_credentials():
 def get_auth_headers():
     creds = get_credentials()
 
-    uid = creds.get('uid')
-    key = creds.get('api_key')
+    api_key_id = creds.get('api_key_id')
+    api_key = creds.get('api_key')
 
-    if not uid:
+    if not api_key_id:
         raise Exception(
-            'Please include your account ID by using the "uid" attribute')
-    if not key:
+            'Please include your API Key ID by using the "api_key_id" attribute')
+    if not api_key:
         raise Exception(
             'Please include your API Key by using the "api_key" attribute')
 
     headers = {
-        "Authorization": f"uid:{uid} key:{key}",
+        "Authorization": f"api_key_id:{api_key_id} api_key:{api_key}",
     }
     return headers
 
@@ -103,7 +103,7 @@ def upload_file(file_path, upload_url):
 def connect():
     """check that you can securely connect to the supadef platform"""
     with yaspin(text="Connecting to supadef platform", color="yellow") as sp:
-        response = requests.get(link('supadef connect'),
+        response = requests.get(f'{SERVICE_ENDPOINT}/cli/connect',
                                 headers=get_auth_headers())
         sp.text = f'Connected [{response.json()}]'
         sp.ok("✅ ")
