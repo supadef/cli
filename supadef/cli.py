@@ -99,16 +99,24 @@ def upload_file(file_path, upload_url):
         return json
 
 
+def GET(route):
+    response = requests.get(f'{SERVICE_ENDPOINT}{route}',
+                            headers=get_auth_headers(),
+                            timeout=TIMEOUT_SECONDS)
+    json = response.json()
+    if not response.status_code == 200:
+        error_msg = json['detail']
+        raise ValueError(error_msg)
+    return json
+
+
 @app.command()
 def connect():
     """check that you can securely connect to the supadef platform"""
     with yaspin(text="Connecting to supadef platform", color="yellow") as sp:
-        response = requests.get(f'{SERVICE_ENDPOINT}/cli/connect',
-                                headers=get_auth_headers())
-        sp.text = f'Connected [{response.json()}]'
+        json = GET('/cli/connect')
+        sp.text = f'Connected [{json}]'
         sp.ok("✅ ")
-        # print(response.status_code)
-        # print(response.json())
 
 
 @app.command()
