@@ -85,6 +85,21 @@ def zip_directory(directory_path, zip_filename):
                 zipf.write(file_path, arcname=arcname)
 
 
+def zip_directory_in_isolated_tempdir(path_to_code: str) -> str:
+    # create an isolated directory to build the package
+    work_dir = create_tempdir('supadef_packages')
+    # copy tree only works on non-existent directories :/
+    shutil.rmtree(work_dir)
+    # copy the source code to the build directory
+    shutil.copytree(path_to_code, work_dir)
+    # wire up the full path to the package.zip file
+    zip_filename = "package.zip"
+    path_to_package_zip = os.path.join(work_dir, zip_filename)
+    # zip up the code in the working dir, which has the client code. place output in that dir
+    zip_directory(work_dir, path_to_package_zip)
+    return path_to_package_zip
+
+
 def upload_file(file_path, upload_url):
     with open(file_path, 'rb') as file:
         files = {'file': (file_path, file)}
@@ -99,10 +114,23 @@ def upload_file(file_path, upload_url):
         return json
 
 
-def GET(route):
+def run_step(step_name, f):
+    with yaspin(text=f"Running: [{step_name}]", color="yellow") as sp:
+        try:
+            out = f()
+            sp.text = ''
+            sp.ok(f"Done ✅: [{step_name}]")
+            return out
+        except Exception as e:
+            sp.text = str(e)
+            sp.fail(f"Error ❌: [{step_name}]")
+
+
+def GET(route, params=None) -> dict:
     response = requests.get(f'{SERVICE_ENDPOINT}{route}',
                             headers=get_auth_headers(),
-                            timeout=TIMEOUT_SECONDS)
+                            timeout=TIMEOUT_SECONDS,
+                            params=params)
     json = response.json()
     if not response.status_code == 200:
         error_msg = json['detail']
@@ -134,40 +162,47 @@ def create(project_name: str):
 @app.command()
 def push(project_name: str, path_to_code: str):
     """push your code to a project"""
-    # with yaspin(text=f"Checking for a git repository at {path_to_code}", color="yellow") as sp:
-    #     time.sleep(2)
-    #     sp.text = f'Found a git repository at {path_to_code}'
-    #     sp.ok("✅ ")
-    #     pass
-    with yaspin(text=f"Packaging your code for project: {project_name}", color="yellow") as sp:
-        try:
-            # create an isolated directory to build the package
-            work_dir = create_tempdir('supadef_packages')
-            # copy tree only works on non-existent directories :/
-            shutil.rmtree(work_dir)
-            # copy the source code to the build directory
-            shutil.copytree(path_to_code, work_dir)
-            # wire up the full path to the package.zip file
-            zip_filename = "package.zip"
-            path_to_package_zip = os.path.join(work_dir, zip_filename)
-            # zip up the code in the working dir, which has the client code. place output in that dir
-            zip_directory(work_dir, path_to_package_zip)
-            # package.zip file location
-            sp.text = f'Packaged your code for project: {project_name} at location: {path_to_package_zip}'
-            sp.ok("✅ ")
-        except Exception as e:
-            sp.text = str(e)
-            sp.fail("❌ ")
-    with yaspin(text=f"Pushing your code to project: {project_name}", color="yellow") as sp:
-        try:
-            # upload the package
-            upload_url = link('supadef push', project=project_name)
-            upload_result_json = upload_file(path_to_package_zip, upload_url)
-            sp.text = f'Uploaded your code'
-            sp.ok("✅ ")
-        except Exception as e:
-            sp.text = str(e)
-            sp.fail("❌ ")
+    def step1_zip():
+        path_to_zip = zip_directory_in_isolated_tempdir(
+            path_to_code)
+        filename = os.path.basename(path_to_zip)
+        return path_to_zip, filename
+
+    path_to_zip, filename = run_step('Package code as .zip', step1_zip)
+
+    # print(f'Package: {path_to_zip}')
+
+    def step2_get_upload_url():
+        r = GET('/cli/get_upload_zip_presigned_url',
+                params={'project_name': project_name, 'file_name': filename})
+        if not 'url' in r:
+            raise ValueError('Could not get upload URL - missing url')
+        if not 'fields' in r:
+            raise ValueError('Could not get upload URL - missing fields')
+        return r
+
+    presigned_post_data = run_step('Get upload URL', step2_get_upload_url)
+
+    # print(f'presigned_post_data: {presigned_post_data}')
+
+    # print('-------')
+    # print(f"url: {presigned_post_data['url']}")
+    # print(f"fields: {presigned_post_data['fields']}")
+    # print(f"fields.key: {presigned_post_data['fields']['key']}")
+    # print('-------')
+
+    def step3_upload_zip():
+        with open(path_to_zip, 'rb') as file:
+            files = {'file': (presigned_post_data['fields']['key'], file)}
+            response = requests.post(
+                presigned_post_data['url'], data=presigned_post_data['fields'], files=files)
+
+        if not (response and response.status_code == 204):
+            raise ValueError(
+                f"Failed to upload file: {response.status_code} - {response.text}")
+
+    upload_response = run_step(
+        f'Upload package to project:{project_name}', step3_upload_zip)
 
 
 @app.command(name='set_env')
