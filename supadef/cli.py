@@ -126,11 +126,23 @@ def run_step(step_name, f):
             sp.fail(f"Error ❌: [{step_name}]")
 
 
-def GET(route, params=None) -> dict:
+def GET(route: str, params: dict = None) -> dict:
     response = requests.get(f'{SERVICE_ENDPOINT}{route}',
                             headers=get_auth_headers(),
                             timeout=TIMEOUT_SECONDS,
                             params=params)
+    json = response.json()
+    if not response.status_code == 200:
+        error_msg = json['detail']
+        raise ValueError(error_msg)
+    return json
+
+
+def POST(route: str, body: dict) -> dict:
+    response = requests.post(f'{SERVICE_ENDPOINT}{route}',
+                             headers=get_auth_headers(),
+                             timeout=TIMEOUT_SECONDS,
+                             json=body)
     json = response.json()
     if not response.status_code == 200:
         error_msg = json['detail']
@@ -150,13 +162,13 @@ def connect():
 @app.command()
 def create(project_name: str):
     """create a new project"""
-    body = {
-        'name': project_name
-    }
-    response = requests.post(link('supadef create'), headers=get_auth_headers(
-    ), json=body, timeout=TIMEOUT_SECONDS)
-    print(response.status_code)
-    print(response.json())
+
+    with yaspin(text="Creating project", color="yellow") as sp:
+        json = POST('/projects/create', {
+            'name': project_name
+        })
+        sp.text = f"Project created: '{project_name}'"
+        sp.ok("✅ ")
 
 
 @app.command()
