@@ -36,6 +36,8 @@ more-itertools==9.0.0
     # via jaraco-classes
 packaging==23.0
     # via pytest
+pathspec==0.12.1
+    # via -r requirements.in
 pkginfo==1.9.6
     # via twine
 pluggy==1.0.0
