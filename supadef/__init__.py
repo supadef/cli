@@ -1,6 +1,6 @@
-def task():
+def server_task():
     """
-    Make a function runnable as a scalable, cloud-hosted task.
+    Make a function runnable as a task on your web servers.
     :return:
     """
     def g(f):
