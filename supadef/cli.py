@@ -1,11 +1,10 @@
-from .push import push_project
+from .push import push_project, set_project_env
 import subprocess
 import json
 import requests
 from typer import Typer, echo
 import typer
 from .config import TIMEOUT_SECONDS, SERVICE_ENDPOINT, LOCAL_CREDS_PATH
-from .links import link
 from tabulate import tabulate
 from yaspin import yaspin
 from .network import GET, POST, get_auth_headers, upload_file, GET_TEXT
@@ -22,8 +21,6 @@ def execute_bash_command(cmd):
         raise subprocess.CalledProcessError(
             process.returncode, cmd, output=stdout, stderr=stderr)
     return stdout.decode().strip()
-
-
 
 
 @app.command()
@@ -79,18 +76,9 @@ def push(project_name: str, path_to_code: str, debug: bool = typer.Option(False,
 
 
 @app.command(name='set_env')
-def set_env(project_name: str, path_to_env_file: str):
+def set_env(project_name: str, path_to_env_file: str, debug: bool = typer.Option(False, "--debug", help="Enable debug mode")):
     """Securely upload an environment file (.env) to your project"""
-    with yaspin(text=f"Securely uploading your environment to project:{project_name}", color="yellow") as sp:
-        try:
-            upload_url = link('supadef set_env', project=project_name)
-            upload_result_json = upload_file(path_to_env_file, upload_url)
-            sp.text = f'Uploaded'
-            sp.ok("✅ ")
-        except Exception as e:
-            sp.text = 'Something went wrong'
-            sp.fail()
-            print(e)
+    set_project_env(project_name, path_to_env_file, debug)
 
 
 @app.command()
