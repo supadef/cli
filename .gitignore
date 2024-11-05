@@ -1,3 +1,6 @@
+*.png
+*.gv
+.aider*
 .idea
 venv
 venv_pub_cli
