@@ -2,9 +2,11 @@ from enum import Enum
 import traceback
 from yaspin import yaspin
 
+
 class FailMode(Enum):
     EXIT = 1
     THROW_ERROR = 2
+
 
 def serialize_exception(exception):
     return {
@@ -13,21 +15,26 @@ def serialize_exception(exception):
         'traceback': ''.join(traceback.format_exception(None, exception, exception.__traceback__))
     }
 
+
 def run_step(step_name: str, f: callable, fail_mode: FailMode = FailMode.EXIT):
     """
     Run a given step, defined in the function f.
 
     To make it possible for the function f to 'print' outputs, it must be of the form:
 
-    f(sp: Yaspin)
+    f(log: callable)
 
-    then, you can 'print' outputs with:
+    then, you can log outputs with
 
-    sp.write(___)
+    log('your message')
     """
+
     with yaspin(text=f"Running: [{step_name}]", color="yellow") as sp:
+        def log(msg):
+            sp.write(msg)
+
         try:
-            out = f(sp)
+            out = f(log)
             sp.text = ''
             sp.ok(f"Done ✅: [{step_name}]")
             return out
