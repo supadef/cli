@@ -7,7 +7,7 @@ import typer
 from .config import TIMEOUT_SECONDS, SERVICE_ENDPOINT, LOCAL_CREDS_PATH
 from tabulate import tabulate
 from yaspin import yaspin
-from .network import GET, POST, get_auth_headers, upload_file, GET_TEXT
+from .network import GET, POST, get_auth_headers, GET_TEXT
 
 app = Typer()
 

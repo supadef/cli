@@ -55,20 +55,6 @@ def POST(route: str, body: dict, handle_error=None) -> dict:
     return json
 
 
-def upload_file(file_path, upload_url):
-    with open(file_path, 'rb') as file:
-        files = {'file': (file_path, file)}
-        response = requests.post(upload_url,
-                                 headers=get_auth_headers(),
-                                 files=files,
-                                 timeout=TIMEOUT_SECONDS)
-        json = response.json()
-        if not response.status_code == 200:
-            error_msg = json['detail']
-            raise ValueError(error_msg)
-        return json
-
-
 def GET_TEXT(route: str) -> dict:
     response = requests.get(f'{SERVICE_ENDPOINT}{route}')
     t = response.text
