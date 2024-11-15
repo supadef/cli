@@ -14,19 +14,14 @@ def get_credentials():
 
 def get_auth_headers():
     creds = get_credentials()
+    api_key = creds.get('default')
 
-    api_key_id = creds.get('api_key_id')
-    api_key = creds.get('api_key')
-
-    if not api_key_id:
-        raise Exception(
-            'Please include your API Key ID by using the "api_key_id" attribute')
     if not api_key:
         raise Exception(
-            'Please include your API Key by using the "api_key" attribute')
+            'Please include your API Key by using the "default" attribute. Only the default key is supported, for now.')
 
     headers = {
-        "Authorization": f"api_key_id:{api_key_id} api_key:{api_key}",
+        "Authorization": f"{api_key}",
     }
     return headers
 
