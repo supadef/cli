@@ -1,4 +1,4 @@
-from version import VERSION
+from .version import VERSION
 from .push import push_project, set_project_env
 import subprocess
 import json
