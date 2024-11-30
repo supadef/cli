@@ -1,3 +1,4 @@
+from version import VERSION
 from .push import push_project, set_project_env
 import subprocess
 import json
@@ -151,7 +152,7 @@ def destroy(project_name: str):
 @app.command()
 def about():
     """basic info about the running version of the CLI"""
-    # print(f'Version: {VERSION}')
+    print(f'v{VERSION}')
     print(f'Service endpoint: {SERVICE_ENDPOINT}')
     print(f'Looking for credentials at: {LOCAL_CREDS_PATH}')
 
