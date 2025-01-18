@@ -1,3 +1,5 @@
+from supadef.run import run_server_task
+from supadef.util import run_step
 from .version import VERSION
 from .push import push_project, set_project_env
 import subprocess
@@ -82,37 +84,19 @@ def set_env(project_name: str, path_to_env_file: str, debug: bool = typer.Option
     set_project_env(project_name, path_to_env_file, debug)
 
 
-@app.command()
-def run(project: str,
-        function: str,
-        args: str,
-        version: str):
+@app.command(name='run_server_task')
+def _run_server_task(project: str,
+                     function: str,
+                     args: str):
     """run your function in the cloud"""
-    with yaspin(text="Submitting task...", color="yellow") as sp:
-        try:
-            run_url = link('supadef run')
 
-            body = {
-                'project': project,
-                'function': function,
-                'args': args,
-                'version': version
-            }
-            response = requests.post(run_url, headers=get_auth_headers(), json=body,
-                                     timeout=TIMEOUT_SECONDS)
+    args_dict = json.loads(args)
 
-            j = response.json()
-            if not response.status_code == 200:
-                error_msg = j['detail']
-                raise ValueError(error_msg)
+    def run_it(log):
+        run_server_task(project, function, args_dict)
 
-            sp.text = f'Task submitted'
-            sp.ok("✅ ")
-            pretty_json = json.dumps(j, indent=4)
-            print(pretty_json)
-        except Exception as e:
-            sp.text = str(e)
-            sp.fail("❌ ")
+    result = run_step(f'[@server_task] run {function}', run_it)
+    return result
 
 
 @app.command()
