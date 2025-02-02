@@ -1,4 +1,5 @@
 import os
+import orjson
 import requests
 from .config import SERVICE_ENDPOINT, LOCAL_CREDS_PATH, TIMEOUT_SECONDS
 from .credentials import parse_credentials
@@ -22,6 +23,7 @@ def get_auth_headers():
 
     headers = {
         "Authorization": f"{api_key}",
+        "Content-Type": "application/json"
     }
     return headers
 
@@ -42,7 +44,7 @@ def POST(route: str, body: dict, handle_error=None) -> dict:
     response = requests.post(f'{SERVICE_ENDPOINT}{route}',
                              headers=get_auth_headers(),
                              timeout=TIMEOUT_SECONDS,
-                             json=body)
+                             data=orjson.dumps(body))
     json = response.json()
     if not response.status_code == 200:
         error_msg = json['detail']
