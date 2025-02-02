@@ -1,25 +1,12 @@
-import os
 import orjson
 import requests
-from .config import SERVICE_ENDPOINT, LOCAL_CREDS_PATH, TIMEOUT_SECONDS
-from .credentials import parse_credentials
 
-
-def get_credentials():
-    path = os.path.expanduser(LOCAL_CREDS_PATH)
-    creds = parse_credentials(path)
-    if not creds:
-        raise Exception(f"Please add your credentials to {path}")
-    return creds
+from supadef.credentials import get_api_key
+from .config import SERVICE_ENDPOINT, TIMEOUT_SECONDS
 
 
 def get_auth_headers():
-    creds = get_credentials()
-    api_key = creds.get('default')
-
-    if not api_key:
-        raise Exception(
-            'Please include your API Key by using the "default" attribute. Only the default key is supported, for now.')
+    api_key = get_api_key(profile=None)
 
     headers = {
         "Authorization": f"{api_key}",
