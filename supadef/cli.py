@@ -1,4 +1,4 @@
-from supadef.run import run_server_task
+from supadef.platform import run_server_task
 from supadef.util import run_step
 from .version import VERSION
 from .push import push_project, set_project_env

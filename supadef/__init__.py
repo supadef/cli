@@ -1,3 +1,6 @@
+from . import platform
+
+
 def server_task():
     """
     Make a function runnable as a task on your web servers.
