@@ -12,15 +12,18 @@ def parse_credentials(path):
 
 
 def get_api_key(profile: Optional[str] = None):
-    # if an env variable has been explicitly set, use that
+    # 1. use the env var if it exists
     SUPADEF_API_KEY = os.getenv("SUPADEF_API_KEY", None)
     if SUPADEF_API_KEY:
         return SUPADEF_API_KEY
-    # read ~/.supadef/credentials.yml
+    # 2. otherwise, look for ~/.supadef/credentials.yml
     path = os.path.expanduser(LOCAL_CREDS_PATH)
-    creds = parse_credentials(path)
-    if not creds:
-        raise Exception(f"Please add your credentials to {path}")
+    try:
+        creds = parse_credentials(path)
+    except FileNotFoundError as err:
+        raise ValueError(
+            f'No api key detected. Please set (1) SUPADEF_API_KEY or (2) {path}')
+
     if profile:
         profile_api_key = creds.get(profile)
         if profile_api_key:
