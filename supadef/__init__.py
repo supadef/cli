@@ -3,7 +3,7 @@ from . import platform
 
 def server_task():
     """
-    Make a function runnable as a task on your web servers.
+    Deploy this function to your servers as a queue-worker
     :return:
     """
     def g(f):
@@ -12,9 +12,9 @@ def server_task():
     return g
 
 
-def endpoint(method='GET'):
+def server_endpoint(method='GET'):
     """
-    Make a function runnable as a scalable, cloud-hosted API Endpoint.
+    Deploy this function to your servers as an API endpoint
     :return:
     """
     def g(f):
