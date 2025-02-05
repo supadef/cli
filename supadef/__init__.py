@@ -1,4 +1,5 @@
 from . import platform
+from . import cli
 
 
 def server_task():
