@@ -25,7 +25,10 @@ def run_fastapi():
             return {"message": "Hello, World!"}
         return app
     """
-    pass
+    def g(f):
+        # intentionally do nothing :)
+        return f
+    return g
 
 
 def server_endpoint(method='GET'):
