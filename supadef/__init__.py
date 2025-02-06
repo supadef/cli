@@ -13,6 +13,21 @@ def server_task():
     return g
 
 
+def run_fastapi():
+    """
+    Return a fastapi app to run. Example:
+
+    @run_fastapi
+    def create_app():
+        app = FastAPI()
+        @app.get("/")
+        async def read_root():
+            return {"message": "Hello, World!"}
+        return app
+    """
+    pass
+
+
 def server_endpoint(method='GET'):
     """
     Deploy this function to your servers as an API endpoint
