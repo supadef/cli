@@ -1,6 +1,10 @@
+from rich.live import Live
+from rich.spinner import Spinner
+from rich.console import Console
 from enum import Enum
 import traceback
-from yaspin import yaspin
+
+console = Console()
 
 
 class FailMode(Enum):
@@ -29,19 +33,26 @@ def run_step(step_name: str, f: callable, fail_mode: FailMode = FailMode.EXIT):
     log('your message')
     """
 
-    with yaspin(text=f"Running: [{step_name}]", color="yellow") as sp:
+    spinner = Spinner("dots", text=f"Running: [{step_name}]", style="yellow")
+
+    with Live(spinner, refresh_per_second=10, console=console) as live:
         def sp_write(msg):
-            sp.write(msg)
+            console.log(msg)
 
         try:
             out = f(sp_write)
-            sp.text = ''
-            sp.ok(f"Done ✅: [{step_name}]")
+            # Update spinner to show completion
+            spinner.text = f"Done ✅: [{step_name}]"
+            spinner.style = "green"
+            live.update(spinner)  # Force final render
             return out
         except Exception as e:
-            sp.text = str(e)
-            sp.fail(f"Error ❌: [{step_name}]")
+            # Update spinner to show error
+            spinner.text = f"Error ❌: [{step_name}]"
+            spinner.style = "red"
+            live.update(spinner)  # Force final render
             if fail_mode == FailMode.EXIT:
-                exit()
+                console.print(f"[bold red]Fatal Error:[/bold red] {e}")
+                exit(1)
             if fail_mode == FailMode.THROW_ERROR:
                 raise e

@@ -8,3 +8,4 @@ yaspin>=3.0.1
 pydantic>=2.0.0
 pathspec>=0.12.1
 orjson >= 3.10,<4
+rich>=14.0.0
