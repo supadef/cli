@@ -18,6 +18,7 @@ def get_api_key(profile: Optional[str] = None):
         return SUPADEF_API_KEY
     # 2. otherwise, look for ~/.supadef/credentials.yml
     path = os.path.expanduser(LOCAL_CREDS_PATH)
+    # path = LOCAL_CREDS_PATH
     try:
         creds = parse_credentials(path)
     except FileNotFoundError as err:

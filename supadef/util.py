@@ -30,11 +30,11 @@ def run_step(step_name: str, f: callable, fail_mode: FailMode = FailMode.EXIT):
     """
 
     with yaspin(text=f"Running: [{step_name}]", color="yellow") as sp:
-        def log(msg):
+        def sp_write(msg):
             sp.write(msg)
 
         try:
-            out = f(log)
+            out = f(sp_write)
             sp.text = ''
             sp.ok(f"Done ✅: [{step_name}]")
             return out
