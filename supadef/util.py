@@ -1,3 +1,4 @@
+from rich.text import Text
 from rich.live import Live
 from rich.spinner import Spinner
 from rich.console import Console
@@ -41,16 +42,14 @@ def run_step(step_name: str, f: callable, fail_mode: FailMode = FailMode.EXIT):
 
         try:
             out = f(sp_write)
-            # Update spinner to show completion
-            spinner.text = f"Done ✅: [{step_name}]"
-            spinner.style = "green"
-            live.update(spinner)  # Force final render
+            # Create a plain text message without spinner for the final state
+            final_message = Text(f"Done ✅: [{step_name}]", style="green")
+            live.update(final_message)
             return out
         except Exception as e:
-            # Update spinner to show error
-            spinner.text = f"Error ❌: [{step_name}]"
-            spinner.style = "red"
-            live.update(spinner)  # Force final render
+            # Create a plain text message without spinner for the error state
+            error_message = Text(f"Error ❌: [{step_name}]", style="red")
+            live.update(error_message)
             if fail_mode == FailMode.EXIT:
                 console.print(f"[bold red]Fatal Error:[/bold red] {e}")
                 exit(1)
