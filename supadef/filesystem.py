@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import tempfile
@@ -5,6 +6,10 @@ import zipfile
 from typing import List
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
+
+from supadef.logger import get_logger
+
+logger = get_logger('supadef_cli', level=logging.DEBUG)
 
 
 def create_tempdir(key, nuke_existing=True):
@@ -65,6 +70,7 @@ def copy_dir(source_dir: str, dest_dir: str, gitignore_content: str):
 
         # Copy the file
         shutil.copy2(source_file, dest_file)
-        print(f"Copied: {file_path}")
+        logger.debug(f"Copied: {file_path}")
 
-    print(f"Copied {len(files_to_copy)} files from {source_dir} to {dest_dir}")
+    logger.debug(
+        f"Copied {len(files_to_copy)} files from {source_dir} to {dest_dir}")
